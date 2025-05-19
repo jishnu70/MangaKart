@@ -17,7 +17,7 @@ async def get_manga_by_id(db: AsyncSession, manga_id:int):
         )
     manga = result.scalars().first()
     if not manga:
-        raise HTTPException(status_code=404, detail="Manga not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Manga not found")
     return manga
 
 async def get_volume_by_id(db: AsyncSession, volume_id: int):
@@ -28,7 +28,7 @@ async def get_volume_by_id(db: AsyncSession, volume_id: int):
     )
     volume = result.scalars().first()
     if not volume:
-        raise HTTPException(status_code=404, detail="Manga not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Manga not found")
     return volume
 
 async def get_volume_by_manga_id(db: AsyncSession, manga_id: int):
@@ -39,7 +39,7 @@ async def get_volume_by_manga_id(db: AsyncSession, manga_id: int):
     )
     volumes = result.scalars().first()
     if not volumes:
-        raise HTTPException(status_code=404, detail="Manga not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Manga not found")
     return volumes
 
 async def add_volume_image(db: AsyncSession, volume_id: int, public_id: str, image_url: str, caption: Optional[str]):
