@@ -12,7 +12,9 @@ async def get_manga_by_id(db: AsyncSession, manga_id:int):
         .filter_by(id=manga_id)
         .options(
             joinedload(Manga.volumes)
-            .joinedload(MangaVolume.images)
+            .joinedload(MangaVolume.images),
+            joinedload(Manga.volumes)
+            .joinedload(MangaVolume.publisher)
             )
         )
     manga = result.unique().scalars().first()
@@ -24,7 +26,10 @@ async def get_volume_by_id(db: AsyncSession, volume_id: int):
     result = await db.execute(
         select(MangaVolume)
         .filter_by(id=volume_id)
-        .options(joinedload(MangaVolume.images))
+        .options(
+            joinedload(MangaVolume.images),
+            joinedload(MangaVolume.publisher)
+        )
     )
     volume = result.unique().scalars().first()
     if not volume:
@@ -35,9 +40,12 @@ async def get_volume_by_manga_id(db: AsyncSession, manga_id: int):
     result = await db.execute(
         select(MangaVolume)
         .filter_by(manga_id=manga_id)
-        .options(joinedload(MangaVolume.images))
+        .options(
+            joinedload(MangaVolume.images),
+            joinedload(MangaVolume.publisher)
+        )
     )
-    volumes = result.unique().scalars().first()
+    volumes = result.unique().scalars().all()
     if not volumes:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Manga not found")
     return volumes
@@ -56,23 +64,46 @@ async def search_manga(db: AsyncSession, query: str):
             select(Manga)
             .options(
                 joinedload(Manga.volumes)
-                .joinedload(MangaVolume.images)
+                .joinedload(MangaVolume.images),
+                joinedload(Manga.volumes)
+                .joinedload(MangaVolume.publisher)
             )
         )
         return result.unique().scalars().all()
     
-    search_filter = or_(
-        Manga.title.ilike(f"%{query}%"),
-        Manga.author.ilike(f"%{query}%"),
-        MangaVolume.title.ilike(f"%{query}%")
-    )
+    query_like = f"%{query}%"
+    response = []
 
-    result = await db.execute(
+    manga_result = await db.execute(
         select(Manga)
-        .distinct()
-        .outerjoin(MangaVolume)
-        .filter(search_filter)
-        .options(joinedload(Manga.volumes).joinedload(MangaVolume.images))
+        .options(
+            joinedload(Manga.volumes).joinedload(MangaVolume.images),
+            joinedload(Manga.volumes).joinedload(MangaVolume.publisher)
+        )
+        .where(
+            Manga.title.ilike(query_like) |
+            Manga.author.ilike(query_like)
+        )
     )
+    mangas = manga_result.unique().scalars().all()
 
-    return result.unique().scalars().all()
+    for manga in mangas:
+        response.append({"manga": manga, "volume": None})
+
+    volume_result = await db.execute(
+        select(MangaVolume)
+        .options(
+            joinedload(MangaVolume.images),
+            joinedload(MangaVolume.publisher)
+        )
+        .where(
+            MangaVolume.title.ilike(query_like)
+        )
+    )
+    volumes = volume_result.unique().scalars().all()
+
+    for volume in volumes:
+        if not any(manga.id == volume.manga_id for manga in mangas):
+            response.append({"manga": None, "volume": volume})
+
+    return response

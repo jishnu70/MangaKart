@@ -9,6 +9,15 @@ class PublisherBase(BaseModel):
     class Config:
         from_attributes = True
 
+class Volume_MangaBase(BaseModel):
+    id: int
+    title: str
+    author: str
+    description: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
 class MangaImageBase(BaseModel):
     id: int
     image_url: Optional[str] = None
@@ -21,13 +30,14 @@ class MangaVolumeBase(BaseModel):
     id: int
     volume_number: int
     title: str
+    manga: Volume_MangaBase
     print_length: int
     language: str
     price: float
     release_date: Optional[date]
     isbn_10: str
     isbn_13: str
-    manga_publisher: PublisherBase
+    publisher: PublisherBase
     images: List[MangaImageBase] = []
 
     class Config:
@@ -57,3 +67,8 @@ class MangaVolumeCreate(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class SearchMangaBase(BaseModel):
+    manga: Optional[MangaBase]
+    volume: Optional[MangaVolumeBase]

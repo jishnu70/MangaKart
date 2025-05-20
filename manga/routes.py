@@ -4,6 +4,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from database.database import get_db
 from manga import schemas, crud
+from manga.models import Manga, MangaVolume  # Added explicit imports for clarity
 from cloudinary.uploader import upload
 import cloudinary
 
@@ -13,14 +14,34 @@ router = APIRouter(prefix="/manga", tags=["manga"])
 async def get_all_mange(db: AsyncSession = Depends(get_db)):
     try:
         result = await db.execute(
-            select(crud.Manga).options(joinedload(crud.Manga.volumes).joinedload(crud.MangaVolume.images)
+            select(Manga)
+            .options(
+                joinedload(Manga.volumes)
+                .joinedload(MangaVolume.images),
+                joinedload(Manga.volumes)
+                .joinedload(MangaVolume.publisher)  # <-- Ensure publisher is loaded
             )
         )
         return result.unique().scalars().all()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"error": str(e)})
-    
-@router.get("/search", response_model=list[schemas.MangaBase])
+
+@router.get("/volumes", response_model=list[schemas.MangaVolumeBase])
+async def get_all_volumes(db: AsyncSession = Depends(get_db)):
+    try:
+        result = await db.execute(
+            select(MangaVolume)
+            .options(
+                joinedload(MangaVolume.manga),
+                joinedload(MangaVolume.publisher),
+                joinedload(MangaVolume.images)
+            )
+        )
+        return result.unique().scalars().all()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"error": str(e)})
+
+@router.get("/search", response_model=list[schemas.SearchMangaBase])
 async def search_manga(q: str = "", db: AsyncSession = Depends(get_db)):
     return await crud.search_manga(db, q)
 
