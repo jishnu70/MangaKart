@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database.database import Base
+from auth.models import User
+from manga.models import MangaVolume
 
 class Order(Base):
     __tablename__ = "order"
@@ -12,5 +14,5 @@ class Order(Base):
     quantity = Column(Integer, default=1)
     timestamp = Column(DateTime, server_default=func.now())
 
-    user = relationship("auth.models.User")
-    volume = relationship("manga.models.MangaVolume", back_populates="orders")
+    user = relationship(User)
+    volume = relationship(MangaVolume, back_populates="orders")
