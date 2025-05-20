@@ -15,7 +15,7 @@ async def get_manga_by_id(db: AsyncSession, manga_id:int):
             .joinedload(MangaVolume.images)
             )
         )
-    manga = result.scalars().first()
+    manga = result.unique().scalars().first()
     if not manga:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Manga not found")
     return manga
@@ -26,7 +26,7 @@ async def get_volume_by_id(db: AsyncSession, volume_id: int):
         .filter_by(id=volume_id)
         .options(joinedload(MangaVolume.images))
     )
-    volume = result.scalars().first()
+    volume = result.unique().scalars().first()
     if not volume:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Manga not found")
     return volume
@@ -37,7 +37,7 @@ async def get_volume_by_manga_id(db: AsyncSession, manga_id: int):
         .filter_by(manga_id=manga_id)
         .options(joinedload(MangaVolume.images))
     )
-    volumes = result.scalars().first()
+    volumes = result.unique().scalars().first()
     if not volumes:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Manga not found")
     return volumes
@@ -59,7 +59,7 @@ async def search_manga(db: AsyncSession, query: str):
                 .joinedload(MangaVolume.images)
             )
         )
-        return result.scalars().all()
+        return result.unique().scalars().all()
     
     search_filter = or_(
         Manga.title.ilike(f"%{query}%"),
@@ -75,4 +75,4 @@ async def search_manga(db: AsyncSession, query: str):
         .options(joinedload(Manga.volumes).joinedload(MangaVolume.images))
     )
 
-    return result.scalars().all()
+    return result.unique().scalars().all()

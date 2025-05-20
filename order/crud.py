@@ -14,7 +14,7 @@ async def get_user_orders(db: AsyncSession, user_id: int):
             joinedload(Order.volume).joinedload(MangaVolume.images)
         )
     )
-    return result.scalars().all()
+    return result.unique().scalars().all()
 
 async def place_order(db: AsyncSession, user_id: int, order_data: OrderCreate):
     # Validate volume exists

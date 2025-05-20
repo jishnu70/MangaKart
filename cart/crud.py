@@ -12,7 +12,7 @@ async def get_user_cart(db: AsyncSession, user_id: int):
         .filter_by(user_id=user_id)
         .options(joinedload(Cart.volume).joinedload(MangaVolume.images))
     )
-    return result.scalars().all()
+    return result.unique().scalars().all()
 
 async def add_to_cart(db: AsyncSession, user_id: int, cart_data: CartCreate):
     result = await db.execute(select(MangaVolume).filter_by(id=cart_data.volume_id))
