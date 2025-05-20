@@ -4,7 +4,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from database.database import get_db
 from manga import schemas, crud
-from manga.models import Manga, MangaVolume  # Added explicit imports for clarity
+from manga.models import Manga, MangaVolume
 from cloudinary.uploader import upload
 import cloudinary
 
@@ -19,7 +19,7 @@ async def get_all_mange(db: AsyncSession = Depends(get_db)):
                 joinedload(Manga.volumes)
                 .joinedload(MangaVolume.images),
                 joinedload(Manga.volumes)
-                .joinedload(MangaVolume.publisher)  # <-- Ensure publisher is loaded
+                .joinedload(MangaVolume.publisher)
             )
         )
         return result.unique().scalars().all()
@@ -60,7 +60,7 @@ async def upload_volume_image(
     caption: str = Form(None),
     db: AsyncSession = Depends(get_db)
 ):
-    await crud.get_volume_by_id(db, volume_id)  # Validate volume exists
+    await crud.get_volume_by_id(db, volume_id)
     try:
         upload_response = upload(file.file)
         image_url = upload_response['secure_url']
