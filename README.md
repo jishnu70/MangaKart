@@ -1,4 +1,4 @@
-# mangaKart_fastapi
+# MangaKart
 
 A FastAPI-based backend for an e-commerce platform specializing in manga volumes.
 
