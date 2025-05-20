@@ -9,10 +9,8 @@ from order.routes import router as order_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Initialize database
     await init_db()
     yield
-    # Shutdown: Close database
     await close_db()
 
 app = FastAPI(lifespan=lifespan)
