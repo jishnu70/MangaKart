@@ -16,7 +16,7 @@ async def get_all_mange(db: AsyncSession = Depends(get_db)):
             select(crud.Manga).options(joinedload(crud.Manga.volumes).joinedload(crud.MangaVolume.images)
             )
         )
-        return result.scalars().all()
+        return result.unique().scalars().all()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"error": str(e)})
     
@@ -26,7 +26,7 @@ async def search_manga(q: str = "", db: AsyncSession = Depends(get_db)):
 
 @router.get("/{manga_id}/volume/", response_model=list[schemas.MangaVolumeBase])
 async def get_manga_volumes(manga_id: int, db: AsyncSession = Depends(get_db)):
-    return await crud.get_volumes_by_manga(db, manga_id)
+    return await crud.get_volume_by_manga_id(db, manga_id)
 
 @router.get("/volume/{volume_id}/", response_model=schemas.MangaVolumeBase)
 async def get_volume_detail(volume_id: int, db: AsyncSession = Depends(get_db)):

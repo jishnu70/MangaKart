@@ -24,11 +24,13 @@ async def add_to_cart(db: AsyncSession, user_id: int, cart_data: CartCreate):
         select(Cart)
         .filter_by(user_id=user_id, volume_id=cart_data.volume_id)
     )
-    cart_item = result.scalars().all()
+    cart_item = result.scalars().first()
 
     if cart_item:
-        # Update quantity
         cart_item.quantity += cart_data.quantity
+        await db.commit()
+        await db.refresh(cart_item)
+        return cart_item
     else:
         # Create new cart item
         cart_item = Cart(
