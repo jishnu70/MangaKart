@@ -7,7 +7,7 @@ from manga.models import MangaVolume
 class Cart(Base):
     __tablename__ = "cart"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     volume_id = Column(Integer, ForeignKey("manga_volume.id"))
     quantity = Column(Integer, default=1)
