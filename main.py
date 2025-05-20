@@ -29,5 +29,5 @@ app.include_router(cart_router)
 app.include_router(order_router)
 
 @app.get("/root")
-async def home_page():
+async def root_page():
     return {"message": "Backend is online"}
