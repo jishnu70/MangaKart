@@ -7,7 +7,7 @@ class PublisherBase(BaseModel):
     publisher_name: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class MangaImageBase(BaseModel):
     id: int
@@ -15,7 +15,7 @@ class MangaImageBase(BaseModel):
     caption: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class MangaVolumeBase(BaseModel):
     id: int
@@ -31,7 +31,7 @@ class MangaVolumeBase(BaseModel):
     images: List[MangaImageBase] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class MangaBase(BaseModel):
     id: int
@@ -41,7 +41,7 @@ class MangaBase(BaseModel):
     volumes: List[MangaVolumeBase] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class MangaVolumeCreate(BaseModel):
     manga_id: int
@@ -56,4 +56,4 @@ class MangaVolumeCreate(BaseModel):
     manga_publisher_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

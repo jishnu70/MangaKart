@@ -17,7 +17,7 @@ class MangaVolumeBase(BaseModel):
     images: list[MangaImageBase] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class CartBase(BaseModel):
     id: int
@@ -25,7 +25,7 @@ class CartBase(BaseModel):
     volume: MangaVolumeBase
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class CartCreate(BaseModel):
     volume_id: int
