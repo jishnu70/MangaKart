@@ -28,7 +28,8 @@ async def get_volume_by_id(db: AsyncSession, volume_id: int):
         .filter_by(id=volume_id)
         .options(
             joinedload(MangaVolume.images),
-            joinedload(MangaVolume.publisher)
+            joinedload(MangaVolume.publisher),
+            joinedload(MangaVolume.manga)
         )
     )
     volume = result.unique().scalars().first()
@@ -42,7 +43,8 @@ async def get_volume_by_manga_id(db: AsyncSession, manga_id: int):
         .filter_by(manga_id=manga_id)
         .options(
             joinedload(MangaVolume.images),
-            joinedload(MangaVolume.publisher)
+            joinedload(MangaVolume.publisher),
+            joinedload(MangaVolume.manga)
         )
     )
     volumes = result.unique().scalars().all()
