@@ -96,7 +96,8 @@ async def search_manga(db: AsyncSession, query: str):
         select(MangaVolume)
         .options(
             joinedload(MangaVolume.images),
-            joinedload(MangaVolume.publisher)
+            joinedload(MangaVolume.publisher),
+            joinedload(MangaVolume.manga)
         )
         .where(
             MangaVolume.title.ilike(query_like)
