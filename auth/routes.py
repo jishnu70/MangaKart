@@ -37,10 +37,10 @@ async def register_user(user:schemas.UserCreate, db:AsyncSession = Depends(get_d
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already taken")
     return await crud.create_user(db, user)
 
-@router.post("/login", response_model=[schemas.TokenResponse])
+@router.post("/login", response_model=schemas.TokenResponse)
 async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db:AsyncSession = Depends(get_db)):
     try:
-        db_user = await crud.get_user_by_username(db, form_data.username)
+        db_user = await crud.get_user_by_username(db, form_data.username) # type: ignore
         if not db_user or not utils.verify_password(form_data.password, db_user.hashed_password): # type: ignore
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
         access_token = utils.create_access_token({"sub": db_user.username})
@@ -55,7 +55,7 @@ async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db:AsyncS
         logger.error(f"Login failed: {str(e)}")
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password")
     
-@router.post("/refresh", response_model=[schemas.TokenResponse])
+@router.post("/refresh", response_model=schemas.TokenResponse)
 async def get_new_access_token(request: schemas.RefreshRequest):
     try:
         new_access_token = utils.get_new_access_token_from_refresh_token(request.refresh_token)
