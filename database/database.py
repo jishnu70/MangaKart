@@ -6,8 +6,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+print(DATABASE_URL)
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+
+engine = create_async_engine(DATABASE_URL, connect_args={"ssl": None}, echo=True) # type: ignore
 async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
 Base = declarative_base()
 
