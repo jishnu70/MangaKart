@@ -50,7 +50,7 @@ def decode_jwt_token(token:str):
 def get_new_access_token_from_refresh_token(token:str):
     payload = decode_jwt_token(token)
     if payload and payload.get("type")=="refresh":
-         user_data = {
+        user_data = {
             "sub": payload.get("sub"),
             "user_id": payload.get("user_id")
         }
